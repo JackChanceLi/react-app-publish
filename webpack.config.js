@@ -4,27 +4,28 @@
 * @Last Modified by:   Rosen
 * @Last Modified time: 2018-02-07 10:35:01
 */
-const path              = require('path');
-const webpack           = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 let WEBPACK_ENV = process.env.WEBPACK_ENV || 'dev';
-console.log(WEBPACK_ENV); 
+console.log(WEBPACK_ENV);
 module.exports = {
     entry: './src/app.jsx',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        publicPath: WEBPACK_ENV === 'dev' 
+        publicPath: WEBPACK_ENV === 'dev'
             ? '/dist/' : '//s.jianliwu.com/admin-v2-fe/dist/',
         filename: 'js/app.js'
     },
+    /**配置别名，配置之后需要重启服务 */
     resolve: {
-        alias : {
-            page        : path.resolve(__dirname, 'src/page'),
-            component   : path.resolve(__dirname, 'src/component'),
-            util        : path.resolve(__dirname, 'src/util'),
-            service     : path.resolve(__dirname, 'src/service')
+        alias: {
+            page: path.resolve(__dirname, 'src/page'),
+            component: path.resolve(__dirname, 'src/component'),
+            util: path.resolve(__dirname, 'src/util'),
+            service: path.resolve(__dirname, 'src/service')
         }
     },
     module: {
@@ -94,23 +95,25 @@ module.exports = {
         new ExtractTextPlugin("css/[name].css"),
         // 提出公共模块
         new webpack.optimize.CommonsChunkPlugin({
-            name : 'common',
+            name: 'common',
             filename: 'js/base.js'
         })
     ],
+    // 开发环境的服务器配置
     devServer: {
         port: 8086,
         historyApiFallback: {
             index: '/dist/index.html'
         },
-        proxy : {
-            '/manage' : {
+        /**解决跨域问题，URL劫持到目标服务器上*/
+        proxy: {
+            '/manage': { /**以/manage开头的路由都会被代理到如下的host上 */
                 target: 'http://admintest.happymmall.com',
-                changeOrigin : true
+                changeOrigin: true /**改变origin，将localhost改为测试服务器地址 */
             },
-            '/user/logout.do' : {
+            '/user/logout.do': {
                 target: 'http://admintest.happymmall.com',
-                changeOrigin : true
+                changeOrigin: true
             }
         }
     }
